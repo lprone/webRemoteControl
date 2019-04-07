@@ -13,8 +13,8 @@
     <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png" />
 
-    <script type="text/javascript" src="https://edducando.com/qr/llqrcode.js"></script>
-    <script type="text/javascript" src="https://edducando.com/qr/webqr.js"></script>
+    <script type="text/javascript" src="llqrcode.js"></script>
+    <script type="text/javascript" src="webqr.js"></script>
 
 </head>
 <body>
