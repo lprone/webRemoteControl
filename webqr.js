@@ -1,4 +1,4 @@
-// QRCODE reader Copyright 2011 Lazar Laszlo
+﻿// QRCODE reader Copyright 2011 Lazar Laszlo
 // http://www.webqr.com
 
 var gCtx = null;
@@ -11,8 +11,8 @@ var moz=false;
 var v=null;
 
 var imghtml='<div id="qrfile"><canvas id="out-canvas" width="320" height="240"></canvas>'+
-    '<div id="imghelp">drag and drop a QRCode here'+
-	'<br>or select a file'+
+    '<div id="imghelp">'+
+	'<br>Seleccione el código QR a escanear'+
 	'<input type="file" onchange="handleFiles(this.files)"/>'+
 	'</div>'+
 '</div>';
@@ -103,33 +103,25 @@ function htmlEntities(str) {
 
 function read(a)
 {
-    var html="<br>";
-    if(a.indexOf("http://") === 0 || a.indexOf("https://") === 0)
-        html+="<a target='_blank' href='"+a+"'>"+a+"</a><br>";
-    html+="<b>"+htmlEntities(a)+"</b><br><br>";
-    document.getElementById("result").innerHTML=html;
+    window.location.href = a; 
 }	
 
 function isCanvasSupported(){
   var elem = document.createElement('canvas');
   return !!(elem.getContext && elem.getContext('2d'));
 }
-function success(stream) {
-    if(webkit)
-        v.src = window.webkitURL.createObjectURL(stream);
-    else
-    if(moz)
-    {
-        v.mozSrcObject = stream;
-        v.play();
-    }
-    else
-        v.src = stream;
+function success(stream) 
+{
+
+    v.srcObject = stream;
+    v.play();
+
     gUM=true;
     setTimeout(captureToCanvas, 500);
 }
 		
-function error(error) {
+function error(error)
+{
     gUM=false;
     return;
 }
@@ -154,6 +146,38 @@ function load()
 
 function setwebcam()
 {
+	
+	var options = true;
+	if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices)
+	{
+		try{
+			navigator.mediaDevices.enumerateDevices()
+			.then(function(devices) {
+			  devices.forEach(function(device) {
+				if (device.kind === 'videoinput') {
+				  if(device.label.toLowerCase().search("back") >-1)
+					options={'deviceId': {'exact':device.deviceId}, 'facingMode':'environment'} ;
+				}
+				console.log(device.kind + ": " + device.label +" id = " + device.deviceId);
+			  });
+			  setwebcam2(options);
+			});
+		}
+		catch(e)
+		{
+			console.log(e);
+		}
+	}
+	else{
+		console.log("no navigator.mediaDevices.enumerateDevices" );
+		setwebcam2(options);
+	}
+	
+}
+
+function setwebcam2(options)
+{
+	console.log(options);
 	document.getElementById("result").innerHTML="- scanning -";
     if(stype==1)
     {
@@ -164,29 +188,36 @@ function setwebcam()
     document.getElementById("outdiv").innerHTML = vidhtml;
     v=document.getElementById("v");
 
+
+    if(n.mediaDevices.getUserMedia)
+    {
+        n.mediaDevices.getUserMedia({video: options, audio: false}).
+            then(function(stream){
+                success(stream);
+            }).catch(function(error){
+                error(error)
+            });
+    }
+    else
     if(n.getUserMedia)
-        n.getUserMedia({video: true, audio: false}, success, error);
+	{
+		webkit=true;
+        n.getUserMedia({video: options, audio: false}, success, error);
+	}
     else
     if(n.webkitGetUserMedia)
     {
         webkit=true;
-        n.webkitGetUserMedia({video: true, audio: false}, success, error);
-    }
-    else
-    if(n.mozGetUserMedia)
-    {
-        moz=true;
-        n.mozGetUserMedia({video: true, audio: false}, success, error);
+        n.webkitGetUserMedia({video:options, audio: false}, success, error);
     }
 
-    //document.getElementById("qrimg").src="qrimg2.png";
-    //document.getElementById("webcamimg").src="webcam.png";
     document.getElementById("qrimg").style.opacity=0.2;
     document.getElementById("webcamimg").style.opacity=1.0;
 
     stype=1;
     setTimeout(captureToCanvas, 500);
 }
+
 function setimg()
 {
 	document.getElementById("result").innerHTML="";

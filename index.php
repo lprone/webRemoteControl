@@ -24,10 +24,10 @@
                 <tr>
                     <td valign="top" align="center" width="50%">
                         <table class="tsel" border="0">
-                            <tr>
+                            <!--tr>
                                 <td><button id="webcamimg" onclick="setwebcam()" align="left">LIMPIAR</button></td>
                                 <td><button id="qrimg" onclick="setimg()" align="right">SUBIR QR</button></td>
-                            </tr>
+                            </tr-->
                             <tr>
                                 <td colspan="2" align="center">
                                     <div id="outdiv">
